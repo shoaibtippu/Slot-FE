@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { SignupFormData, UserRole } from '@/types/auth';
+import { SignupFormData, UserRole, SystemRole } from '@/types/auth';
+import { signupUser } from '@/services/authService';
 import { AuthHeader } from './AuthHeader';
 import { SocialAuth } from './SocialAuth';
 import { ProfilePhotoUpload } from './ProfilePhotoUpload';
@@ -11,7 +12,7 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Checkbox } from '../ui/Checkbox';
 import { Button } from '../ui/Button';
-import { MapPin, Eye, EyeOff } from 'lucide-react';
+import { MapPin, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const COUNTRY_CODES = [
   { value: '+1', label: '+1' },
@@ -46,7 +47,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
   const [isSubmittedSuccess, setIsSubmittedSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>('Account Successfully Created');
 
   // Dynamic Password Validation
   const passwordValidation = useMemo(() => {
@@ -60,6 +63,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
 
   const handleChange = (field: keyof SignupFormData, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (apiError) setApiError(null);
     if (errors[field]) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -93,7 +97,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (!passwordValidation.hasMinLength || !passwordValidation.hasNumber || !passwordValidation.hasSpecialChar) {
-      newErrors.password = 'Password does not meet requirements';
+      newErrors.password = 'Password does not meet security requirements';
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -108,50 +112,94 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setIsSubmittedSuccess(true);
-      }, 1000);
+    setApiError(null);
+
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Map UI role to backend SystemRole enum (User = 2, GroundOwner = 3)
+      const apiRole = formData.role === 'owner' ? SystemRole.GroundOwner : SystemRole.User;
+      const formattedPhone = `${formData.countryCode} ${formData.phone.trim()}`;
+
+      const response = await signupUser({
+        email: formData.email.trim(),
+        password: formData.password,
+        fullName: formData.fullName.trim(),
+        phoneNumber: formattedPhone,
+        city: formData.cityArea.trim(),
+        role: apiRole,
+      });
+
+      setSuccessMessage(response.message || 'Account Successfully Created');
+      setIsSubmittedSuccess(true);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setApiError(err.message);
+      } else {
+        setApiError('An error occurred while creating your account. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // Success Box Component
   if (isSubmittedSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center space-y-4 my-auto max-w-md">
-        <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-3xl animate-bounce">
-          ✓
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-xl border border-emerald-100 flex flex-col items-center text-center space-y-5 my-auto">
+        <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-3xl shadow-sm">
+          <CheckCircle2 className="w-10 h-10 text-emerald-700" />
         </div>
-        <h2 className="text-2xl font-extrabold text-gray-900">Registration Successful!</h2>
-        <p className="text-sm text-gray-600">
-          Welcome to <span className="font-semibold text-[#0b3327]">Slot</span> as a{' '}
-          <span className="font-semibold capitalize text-emerald-700">{formData.role === 'owner' ? 'Ground Owner' : 'Player/User'}</span>!
-        </p>
-        <Button
-          onClick={() => {
-            setIsSubmittedSuccess(false);
-            setFormData({
-              profilePhoto: null,
-              profilePhotoPreview: null,
-              role: 'user',
-              fullName: '',
-              email: '',
-              countryCode: '+1',
-              phone: '',
-              cityArea: '',
-              password: '',
-              confirmPassword: '',
-              agreeToTerms: false,
-            });
-          }}
-          variant="outline"
-          size="md"
-        >
-          Back to Signup
-        </Button>
+        
+        <div className="space-y-2">
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            Account Successfully Created!
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+            {successMessage}. Welcome to <span className="font-bold text-[#0b3327]">Slot</span>! You can now log in with your email <span className="font-semibold text-emerald-800">{formData.email}</span>.
+          </p>
+        </div>
+
+        <div className="w-full pt-2 flex flex-col gap-2">
+          {onLoginClick && (
+            <Button
+              onClick={onLoginClick}
+              variant="primary"
+              fullWidth
+              size="md"
+            >
+              Proceed to Sign In
+            </Button>
+          )}
+
+          <Button
+            onClick={() => {
+              setIsSubmittedSuccess(false);
+              setFormData({
+                profilePhoto: null,
+                profilePhotoPreview: null,
+                role: 'user',
+                fullName: '',
+                email: '',
+                countryCode: '+1',
+                phone: '',
+                cityArea: '',
+                password: '',
+                confirmPassword: '',
+                agreeToTerms: false,
+              });
+            }}
+            variant="outline"
+            fullWidth
+            size="md"
+          >
+            Create Another Account
+          </Button>
+        </div>
       </div>
     );
   }
@@ -162,11 +210,19 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
         {/* Auth Top Branding & Title Header */}
         <AuthHeader onLoginClick={onLoginClick} />
 
+        {/* API Error Notification Alert Box */}
+        {apiError && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-start gap-2.5 text-xs animate-shake">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+            <span className="leading-snug font-medium">{apiError}</span>
+          </div>
+        )}
+
         {/* Social Login Button */}
         <SocialAuth />
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          {/* Profile Photo Uploader */}
+          {/* Profile Photo Uploader (UI local state) */}
           <ProfilePhotoUpload
             photoPreview={formData.profilePhotoPreview}
             onPhotoChange={(file, previewUrl) => {
