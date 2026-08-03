@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { LoginFormData, ApiLoginResponse } from '@/types/auth';
 import { loginUser } from '@/services/authService';
+import { getUserRoleFromToken } from '@/lib/jwt';
 import { LoginHeader } from './LoginHeader';
 import { SecurityNotice } from './SecurityNotice';
 import { Input } from '../ui/Input';
@@ -13,13 +15,17 @@ interface LoginFormProps {
   onSignupClick?: () => void;
   onForgotPasswordClick?: () => void;
   onGoogleClick?: () => void;
+  onLoginSuccess?: (role: string | null) => void;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   onSignupClick,
   onForgotPasswordClick,
   onGoogleClick,
+  onLoginSuccess,
 }) => {
+  const router = useRouter();
+
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -76,6 +82,22 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       });
 
       setLoginResponse(response);
+
+      // Extract JWT role from accessToken claims
+      const token = response.accessToken || (typeof window !== 'undefined' ? localStorage.getItem('slot_auth_token') : null);
+      const role = token ? getUserRoleFromToken(token) : null;
+
+      // If user role is GroundOwner, redirect immediately to the Ground Owner Dashboard
+      if (role === 'GroundOwner' || role === '3') {
+        if (onLoginSuccess) {
+          onLoginSuccess(role);
+        } else {
+          router.push('/dashboard/ground-owner');
+        }
+        return;
+      }
+
+      // Default success state for other roles
       setIsLoggedInSuccess(true);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -88,7 +110,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
-  // Logged In Success Screen
+  // Logged In Success Screen for standard users
   if (isLoggedInSuccess) {
     const displayEmail = loginResponse?.email || formData.email;
 
@@ -111,31 +133,37 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             {loginResponse?.userId && (
               <p><span className="font-semibold text-slate-900">User ID:</span> {loginResponse.userId}</p>
             )}
-            {loginResponse?.accessToken && (
-              <p className="text-[10px] text-gray-400 font-mono break-all pt-1 border-t border-slate-200">
-                Access Token: {loginResponse.accessToken.substring(0, 32)}...
-              </p>
-            )}
           </div>
         </div>
 
-        <Button
-          onClick={() => {
-            setIsLoggedInSuccess(false);
-            setLoginResponse(null);
-            setFormData({ email: '', password: '' });
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('slot_auth_token');
-              localStorage.removeItem('slot_user_id');
-              localStorage.removeItem('slot_user_email');
-            }
-          }}
-          variant="outline"
-          fullWidth
-          size="md"
-        >
-          Sign Out
-        </Button>
+        <div className="w-full pt-2 flex flex-col gap-2">
+          <Button
+            onClick={() => router.push('/dashboard/ground-owner')}
+            variant="primary"
+            fullWidth
+            size="md"
+          >
+            View Ground Owner Dashboard
+          </Button>
+
+          <Button
+            onClick={() => {
+              setIsLoggedInSuccess(false);
+              setLoginResponse(null);
+              setFormData({ email: '', password: '' });
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('slot_auth_token');
+                localStorage.removeItem('slot_user_id');
+                localStorage.removeItem('slot_user_email');
+              }
+            }}
+            variant="outline"
+            fullWidth
+            size="md"
+          >
+            Sign Out
+          </Button>
+        </div>
       </div>
     );
   }
