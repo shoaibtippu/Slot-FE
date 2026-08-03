@@ -43,6 +43,19 @@ export interface ApiSignupResponse {
   [key: string]: unknown;
 }
 
+export interface ApiLoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface ApiLoginResponse {
+  accessToken: string | null;
+  email: string | null;
+  userId: string | null;
+  error: string | null;
+  [key: string]: unknown;
+}
+
 export interface PasswordValidationState {
   hasMinLength: boolean;
   hasNumber: boolean;

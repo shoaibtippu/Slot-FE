@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LoginFormData } from '@/types/auth';
+import { LoginFormData, ApiLoginResponse } from '@/types/auth';
+import { loginUser } from '@/services/authService';
 import { LoginHeader } from './LoginHeader';
 import { SecurityNotice } from './SecurityNotice';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface LoginFormProps {
   onSignupClick?: () => void;
@@ -27,10 +28,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
   const [isLoggedInSuccess, setIsLoggedInSuccess] = useState(false);
+  const [loginResponse, setLoginResponse] = useState<ApiLoginResponse | null>(null);
 
   const handleChange = (field: keyof LoginFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (apiError) setApiError(null);
     if (errors[field]) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -57,33 +61,77 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setIsLoggedInSuccess(true);
-      }, 1000);
+    setApiError(null);
+
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await loginUser({
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+
+      setLoginResponse(response);
+      setIsLoggedInSuccess(true);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setApiError(err.message);
+      } else {
+        setApiError('Invalid credentials or authentication error. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // Logged In Success Screen
   if (isLoggedInSuccess) {
+    const displayEmail = loginResponse?.email || formData.email;
+
     return (
-      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-xl border border-gray-100 flex flex-col items-center text-center space-y-4 my-auto">
-        <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-3xl animate-bounce">
-          ✓
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-xl border border-emerald-100 flex flex-col items-center text-center space-y-4 my-auto">
+        <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-3xl shadow-sm">
+          <CheckCircle2 className="w-10 h-10 text-emerald-700" />
         </div>
-        <h2 className="text-2xl font-extrabold text-gray-900">Welcome Back!</h2>
-        <p className="text-sm text-gray-600">
-          You are now signed in as <span className="font-semibold text-[#0b3327]">{formData.email}</span>.
-        </p>
+        
+        <div className="space-y-1.5 w-full">
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            Welcome Back!
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-600">
+            Login successful. You can now manage your grounds and bookings.
+          </p>
+
+          <div className="p-3 bg-slate-50 rounded-xl text-xs text-slate-700 space-y-1 mt-3 border border-slate-200 text-left">
+            <p><span className="font-semibold text-slate-900">Email:</span> {displayEmail}</p>
+            {loginResponse?.userId && (
+              <p><span className="font-semibold text-slate-900">User ID:</span> {loginResponse.userId}</p>
+            )}
+            {loginResponse?.accessToken && (
+              <p className="text-[10px] text-gray-400 font-mono break-all pt-1 border-t border-slate-200">
+                Access Token: {loginResponse.accessToken.substring(0, 32)}...
+              </p>
+            )}
+          </div>
+        </div>
+
         <Button
           onClick={() => {
             setIsLoggedInSuccess(false);
+            setLoginResponse(null);
             setFormData({ email: '', password: '' });
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('slot_auth_token');
+              localStorage.removeItem('slot_user_id');
+              localStorage.removeItem('slot_user_email');
+            }
           }}
           variant="outline"
+          fullWidth
           size="md"
         >
           Sign Out
@@ -95,9 +143,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   return (
     <div className="w-full max-w-md flex flex-col justify-between h-full max-h-screen py-6 px-4 sm:px-6">
       {/* Floating White Login Card */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-gray-200/70 space-y-5 my-auto">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-gray-200/70 space-y-4.5 my-auto">
         {/* Header */}
         <LoginHeader />
+
+        {/* API Error Notification Alert Box */}
+        {apiError && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-start gap-2.5 text-xs animate-shake">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+            <span className="leading-snug font-medium">{apiError}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Address Input */}

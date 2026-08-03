@@ -1,4 +1,4 @@
-import { ApiSignupPayload, ApiSignupResponse } from '@/types/auth';
+import { ApiSignupPayload, ApiSignupResponse, ApiLoginPayload, ApiLoginResponse } from '@/types/auth';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7120';
 
@@ -37,7 +37,6 @@ export async function signupUser(payload: ApiSignupPayload): Promise<ApiSignupRe
     return data;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      // If error is caused by self-signed SSL cert in local development
       if (error.message.includes('fetch failed') || error.message.includes('NetworkError')) {
         throw new Error(
           'Unable to reach backend server at https://localhost:7120. Please verify your backend server is running and HTTPS certificate is accepted.'
@@ -46,5 +45,69 @@ export async function signupUser(payload: ApiSignupPayload): Promise<ApiSignupRe
       throw error;
     }
     throw new Error('An unexpected error occurred during signup.');
+  }
+}
+
+export async function loginUser(payload: ApiLoginPayload): Promise<ApiLoginResponse> {
+  const url = `${BASE_URL}/api/account/login`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    let data: ApiLoginResponse = {
+      accessToken: null,
+      email: null,
+      userId: null,
+      error: null,
+    };
+
+    const responseText = await response.text();
+
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data.error = responseText;
+      }
+    }
+
+    // Check backend error field or HTTP status error
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    if (!response.ok) {
+      throw new Error(`Login failed with status code ${response.status}`);
+    }
+
+    // Store auth token and user id in localStorage upon success
+    if (data.accessToken && typeof window !== 'undefined') {
+      localStorage.setItem('slot_auth_token', data.accessToken);
+      if (data.userId) {
+        localStorage.setItem('slot_user_id', data.userId);
+      }
+      if (data.email) {
+        localStorage.setItem('slot_user_email', data.email);
+      }
+    }
+
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message.includes('fetch failed') || error.message.includes('NetworkError')) {
+        throw new Error(
+          'Unable to reach backend server at https://localhost:7120. Please verify your backend server is running and HTTPS certificate is accepted.'
+        );
+      }
+      throw error;
+    }
+    throw new Error('An unexpected error occurred during login.');
   }
 }
