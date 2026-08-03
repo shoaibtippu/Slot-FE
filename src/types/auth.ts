@@ -14,6 +14,11 @@ export interface SignupFormData {
   agreeToTerms: boolean;
 }
 
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 export interface PasswordValidationState {
   hasMinLength: boolean;
   hasNumber: boolean;

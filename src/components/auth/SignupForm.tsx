@@ -23,7 +23,11 @@ const COUNTRY_CODES = [
   { value: '+49', label: '+49' },
 ];
 
-export const SignupForm: React.FC = () => {
+interface SignupFormProps {
+  onLoginClick?: () => void;
+}
+
+export const SignupForm: React.FC<SignupFormProps> = ({ onLoginClick }) => {
   const [formData, setFormData] = useState<SignupFormData>({
     profilePhoto: null,
     profilePhotoPreview: null,
@@ -156,7 +160,7 @@ export const SignupForm: React.FC = () => {
     <div className="w-full max-w-xl mx-auto px-6 sm:px-10 py-5 flex flex-col justify-between h-full max-h-screen overflow-hidden">
       <div className="space-y-3.5 my-auto">
         {/* Auth Top Branding & Title Header */}
-        <AuthHeader />
+        <AuthHeader onLoginClick={onLoginClick} />
 
         {/* Social Login Button */}
         <SocialAuth />
