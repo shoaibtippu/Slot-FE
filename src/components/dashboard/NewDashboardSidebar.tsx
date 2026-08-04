@@ -19,7 +19,7 @@ export const NewDashboardSidebar: React.FC<NewDashboardSidebarProps> = ({
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard/ground-owner' },
     { label: 'My Grounds', icon: MapPin, route: '/dashboard/my-grounds' },
-    { label: 'Bookings', icon: Calendar, route: '#' },
+    { label: 'Bookings', icon: Calendar, route: '/dashboard/bookings' },
     { label: 'Settings', icon: Settings, route: '#' },
   ];
 
