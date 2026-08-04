@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Clock, Copy, Trash2, ChevronDown, Trophy } from 'lucide-react';
+import { Select } from '../ui/Select';
 
 interface DaySchedule {
   day: string;
@@ -108,36 +109,32 @@ export const WeeklyScheduleBuilder: React.FC = () => {
               <div className="flex items-center gap-2 flex-1 max-w-md">
                 {/* Open Time */}
                 <div className="relative flex-1">
-                  <select
+                  <Select
+                    variant="small"
                     value={item.openTime}
                     disabled={!item.enabled}
                     onChange={(e) => handleTimeChange(index, 'openTime', e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-2xs focus:outline-none focus:border-emerald-600 cursor-pointer disabled:bg-gray-100"
-                  >
-                    {TIME_OPTIONS.map((t) => (
-                      <option key={t} value={t}>
-                        Open {t}
-                      </option>
-                    ))}
-                  </select>
+                    options={TIME_OPTIONS.map((t) => ({
+                      value: t,
+                      label: `Open ${t}`,
+                    }))}
+                  />
                 </div>
 
                 <span className="text-gray-400 font-medium text-xs">–</span>
 
                 {/* Close Time */}
                 <div className="relative flex-1">
-                  <select
+                  <Select
+                    variant="small"
                     value={item.closeTime}
                     disabled={!item.enabled}
                     onChange={(e) => handleTimeChange(index, 'closeTime', e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-2xs focus:outline-none focus:border-emerald-600 cursor-pointer disabled:bg-gray-100"
-                  >
-                    {TIME_OPTIONS.map((t) => (
-                      <option key={t} value={t}>
-                        Close {t}
-                      </option>
-                    ))}
-                  </select>
+                    options={TIME_OPTIONS.map((t) => ({
+                      value: t,
+                      label: `Close ${t}`,
+                    }))}
+                  />
                 </div>
               </div>
 

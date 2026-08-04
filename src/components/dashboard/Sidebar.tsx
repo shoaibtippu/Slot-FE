@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { LayoutDashboard, MapPin, Calendar, DollarSign, Settings } from 'lucide-react';
 
 interface SidebarProps {
@@ -12,12 +15,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userName = 'John Doe',
   userRole = 'Admin Account',
 }) => {
+  const router = useRouter();
+
   const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard },
-    { label: 'Grounds', icon: MapPin },
-    { label: 'Bookings', icon: Calendar },
-    { label: 'Earnings', icon: DollarSign },
-    { label: 'Settings', icon: Settings },
+    { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard/ground-owner' },
+    { label: 'Grounds', icon: MapPin, route: '/dashboard/ground-pricing' },
+    { label: 'Bookings', icon: Calendar, route: '#' },
+    { label: 'Earnings', icon: DollarSign, route: '#' },
+    { label: 'Settings', icon: Settings, route: '#' },
   ];
 
   const initials = userName
@@ -48,6 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.label}
                 type="button"
+                onClick={() => item.route !== '#' && router.push(item.route)}
                 className={`
                   w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer
                   ${isActive
