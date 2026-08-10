@@ -1,4 +1,5 @@
 import { ApiSignupPayload, ApiSignupResponse, ApiLoginPayload, ApiLoginResponse } from '@/types/auth';
+import { setAuthToken } from '@/lib/auth';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7120';
 
@@ -87,15 +88,9 @@ export async function loginUser(payload: ApiLoginPayload): Promise<ApiLoginRespo
       throw new Error(`Login failed with status code ${response.status}`);
     }
 
-    // Store auth token and user id in localStorage upon success
-    if (data.accessToken && typeof window !== 'undefined') {
-      localStorage.setItem('slot_auth_token', data.accessToken);
-      if (data.userId) {
-        localStorage.setItem('slot_user_id', data.userId);
-      }
-      if (data.email) {
-        localStorage.setItem('slot_user_email', data.email);
-      }
+    // Store auth token and user id in localStorage and cookie upon success
+    if (data.accessToken) {
+      setAuthToken(data.accessToken, data.userId || undefined, data.email || undefined);
     }
 
     return data;

@@ -1,51 +1,99 @@
+'use client';
+
 import React from 'react';
-import { Logo } from '../common/Logo';
-import { Search, Bell, HelpCircle } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Bell, User } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
-export const DashboardHeader: React.FC = () => {
+interface DashboardHeaderProps {
+  title?: string;
+  subtitle?: string;
+  actions?: React.ReactNode;
+}
+
+export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+  title,
+  subtitle,
+  actions,
+}) => {
+  const pathname = usePathname();
+  const { user } = useAuth();
+
+  const userName = user?.name || 'Owner';
+
+  const getPageMeta = () => {
+    if (title) return { heading: title, sub: subtitle || '' };
+
+    if (pathname.includes('/stats')) {
+      return {
+        heading: `Good morning, ${userName}`,
+        sub: "Here's what's happening today at your facilities.",
+      };
+    }
+    if (pathname.includes('/grounds')) {
+      return {
+        heading: 'My Grounds',
+        sub: 'Manage and update your sports facilities and availability.',
+      };
+    }
+    if (pathname.includes('/bookings')) {
+      return {
+        heading: 'Bookings',
+        sub: 'View, filter, and track all incoming ground reservations.',
+      };
+    }
+    if (pathname.includes('/settings')) {
+      return {
+        heading: 'Account Settings',
+        sub: 'Manage your profile preferences, notifications, and credentials.',
+      };
+    }
+
+    return {
+      heading: `Welcome back, ${userName}`,
+      sub: 'Facility Management System',
+    };
+  };
+
+  const pageMeta = getPageMeta();
+
   return (
-    <header className="w-full bg-[#0b3327] text-white px-6 py-3 flex items-center justify-between shadow-sm shrink-0">
-      {/* Brand Logo */}
-      <div className="flex items-center gap-8">
-        <Logo size="md" variant="light" />
+    <header className="w-full bg-white px-6 sm:px-8 py-5 flex items-center justify-between border-b border-gray-100 shrink-0">
+      <div>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
+          {pageMeta.heading}
+        </h1>
+        {pageMeta.sub && (
+          <p className="text-xs text-gray-500 mt-0.5 font-medium">{pageMeta.sub}</p>
+        )}
       </div>
 
-      {/* Center Search Facilities Bar */}
-      <div className="flex-1 max-w-md mx-8">
-        <div className="relative flex items-center">
-          <Search className="w-4 h-4 absolute left-3.5 text-emerald-200/70 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search facilities..."
-            className="w-full rounded-xl bg-emerald-950/60 border border-emerald-700/50 px-3.5 py-1.5 pl-10 text-xs text-white placeholder:text-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400 transition-all"
-          />
-        </div>
-      </div>
+      <div className="flex items-center gap-4">
+        {actions}
 
-      {/* Right Icons & Support */}
-      <div className="flex items-center gap-4 text-emerald-100">
+        {/* Notification Bell */}
         <button
           type="button"
           aria-label="Notifications"
-          className="p-1.5 hover:text-white hover:bg-emerald-800/50 rounded-lg transition-colors cursor-pointer"
+          className="relative p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
         >
-          <Bell className="w-4 h-4" />
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
         </button>
 
-        <button
-          type="button"
-          aria-label="Help"
-          className="p-1.5 hover:text-white hover:bg-emerald-800/50 rounded-lg transition-colors cursor-pointer"
-        >
-          <HelpCircle className="w-4 h-4" />
-        </button>
+        {/* User Profile Avatar */}
+        <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
+          <div className="text-right hidden sm:block">
+            <p className="text-xs font-bold text-gray-900">{userName}</p>
+            <p className="text-[11px] text-gray-500 font-medium truncate max-w-[120px]">
+              {user?.email || 'Owner Portal'}
+            </p>
+          </div>
 
-        <a
-          href="#"
-          className="text-xs font-medium hover:text-white transition-colors ml-1"
-        >
-          Support
-        </a>
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 shadow-2xs flex items-center justify-center bg-[#0b3327] text-white">
+            <User className="w-5 h-5" />
+          </div>
+        </div>
       </div>
     </header>
   );

@@ -19,7 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard/ground-owner' },
-    { label: 'Grounds', icon: MapPin, route: '/dashboard/ground-pricing' },
+    { label: 'Grounds', icon: MapPin, route: '#' },
     { label: 'Bookings', icon: Calendar, route: '#' },
     { label: 'Earnings', icon: DollarSign, route: '#' },
     { label: 'Settings', icon: Settings, route: '#' },

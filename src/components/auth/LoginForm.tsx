@@ -11,6 +11,8 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 
+import { useAuth } from '@/context/AuthContext';
+
 interface LoginFormProps {
   onSignupClick?: () => void;
   onForgotPasswordClick?: () => void;
@@ -25,6 +27,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onLoginSuccess,
 }) => {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -83,22 +86,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       setLoginResponse(response);
 
-      // Extract JWT role from accessToken claims
       const token = response.accessToken || (typeof window !== 'undefined' ? localStorage.getItem('slot_auth_token') : null);
-      const role = token ? getUserRoleFromToken(token) : null;
-
-      // If user role is GroundOwner, redirect immediately to the Ground Owner Dashboard
-      if (role === 'GroundOwner' || role === '3') {
-        if (onLoginSuccess) {
-          onLoginSuccess(role);
-        } else {
-          router.push('/dashboard/ground-owner');
-        }
-        return;
+      if (token) {
+        login(token, response.email || formData.email, response.userId || undefined);
       }
 
-      // Default success state for other roles
-      setIsLoggedInSuccess(true);
+      const role = token ? getUserRoleFromToken(token) : null;
+      if (onLoginSuccess) {
+        onLoginSuccess(role);
+      } else {
+        router.replace('/dashboard/stats');
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setApiError(err.message);
@@ -138,7 +136,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         <div className="w-full pt-2 flex flex-col gap-2">
           <Button
-            onClick={() => router.push('/dashboard/ground-owner')}
+            onClick={() => router.push('/dashboard/stats')}
             variant="primary"
             fullWidth
             size="md"

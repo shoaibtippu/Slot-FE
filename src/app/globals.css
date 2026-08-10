@@ -3,7 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --font-sans: var(--font-roboto), 'Roboto', sans-serif;
+  --font-sans: var(--font-roboto), 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  --primary-color: #0b3327;
+  --primary-hover: #06241b;
+  --accent-color: #10b981;
 }
 
 @theme inline {
@@ -13,10 +16,52 @@
 }
 
 html, body {
-  font-family: var(--font-roboto), 'Roboto', sans-serif;
+  font-family: var(--font-sans);
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
 }

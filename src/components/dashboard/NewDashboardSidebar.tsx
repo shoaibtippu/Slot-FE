@@ -17,10 +17,10 @@ export const NewDashboardSidebar: React.FC<NewDashboardSidebarProps> = ({
   const router = useRouter();
 
   const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard/ground-owner' },
-    { label: 'My Grounds', icon: MapPin, route: '/dashboard/my-grounds' },
+    { label: 'Dashboard', icon: LayoutDashboard, route: '/dashboard/stats' },
+    { label: 'My Grounds', icon: MapPin, route: '/dashboard/grounds' },
     { label: 'Bookings', icon: Calendar, route: '/dashboard/bookings' },
-    { label: 'Settings', icon: Settings, route: '#' },
+    { label: 'Settings', icon: Settings, route: '/dashboard/settings' },
   ];
 
   const handleLogoutClick = () => {

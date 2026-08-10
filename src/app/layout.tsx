@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
+import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
 
 const roboto = Roboto({
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${roboto.variable} h-full antialiased`}>
       <body className="h-full w-full font-sans bg-white text-gray-900 overflow-hidden">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

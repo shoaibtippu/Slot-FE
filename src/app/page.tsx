@@ -1,63 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import { LoginHero } from '@/components/auth/LoginHero';
-import { LoginForm } from '@/components/auth/LoginForm';
-import { AuthHero } from '@/components/auth/AuthHero';
-import { SignupForm } from '@/components/auth/SignupForm';
-import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState<'login' | 'signup' | 'forgot-password'>('login');
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
 
-  const handleLoginClick = () => {
-    setCurrentView('login');
-  };
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.replace('/dashboard/stats');
+      } else {
+        router.replace('/login');
+      }
+    }
+  }, [isLoading, isAuthenticated, router]);
 
-  const handleSignupClick = () => {
-    setCurrentView('signup');
-  };
-
-  const handleForgotPasswordClick = () => {
-    setCurrentView('forgot-password');
-  };
-
-  if (currentView === 'signup') {
-    return (
-      <main className="h-screen w-screen max-h-screen max-w-vw flex flex-row bg-white overflow-hidden font-sans">
-        {/* Left Panel: Hero Section - Exactly 50% width */}
-        <div className="w-1/2 h-full shrink-0 overflow-hidden hidden md:block">
-          <AuthHero />
-        </div>
-
-        {/* Right Panel: Signup Form Section - Exactly 50% width */}
-        <div className="w-full md:w-1/2 h-full flex items-center justify-center overflow-hidden">
-          <SignupForm onLoginClick={handleLoginClick} />
-        </div>
-      </main>
-    );
-  }
-
-  if (currentView === 'forgot-password') {
-    return (
-      <ForgotPasswordForm onLoginClick={handleLoginClick} />
-    );
-  }
-
-  // Default View: Login Screen
   return (
-    <main className="h-screen w-screen max-h-screen max-w-vw flex flex-row bg-[#f8fafc] overflow-hidden font-sans">
-      {/* Left Panel: Hero Section - Exactly 50% width */}
-      <div className="w-1/2 h-full shrink-0 overflow-hidden hidden md:block">
-        <LoginHero />
-      </div>
-
-      {/* Right Panel: Login Form Card Container - Exactly 50% width */}
-      <div className="w-full md:w-1/2 h-full flex items-center justify-center overflow-hidden">
-        <LoginForm
-          onSignupClick={handleSignupClick}
-          onForgotPasswordClick={handleForgotPasswordClick}
-        />
+    <main className="h-screen w-screen flex flex-col items-center justify-center bg-[#f8fafc]">
+      <div className="flex flex-col items-center space-y-3">
+        <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-semibold text-gray-500">Loading Slot...</p>
       </div>
     </main>
   );
