@@ -51,6 +51,28 @@ const SAMPLE_GROUNDS: GroundData[] = [
     tags: ['Cricket Nets', 'Academy'],
     imageUrl: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=800&q=80',
   },
+  {
+    id: '5',
+    name: 'Padel Arena Lahore',
+    location: 'Gulberg III, Lahore',
+    rating: 4.9,
+    reviewsCount: 154,
+    hourlyRate: 'PKR 4,000',
+    status: 'ACTIVE',
+    tags: ['Padel', 'Floodlights'],
+    imageUrl: 'https://images.unsplash.com/photo-1626248801379-51a0748a5f96?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    id: '6',
+    name: 'Champion Turf Complex',
+    location: 'Valencia Town, Lahore',
+    rating: 4.6,
+    reviewsCount: 98,
+    hourlyRate: 'PKR 2,800',
+    status: 'ACTIVE',
+    tags: ['Football', 'Cricket'],
+    imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+  },
 ];
 
 export const MyGroundsGrid: React.FC = () => {
@@ -58,19 +80,19 @@ export const MyGroundsGrid: React.FC = () => {
   const [grounds] = useState<GroundData[]>(SAMPLE_GROUNDS);
 
   const handleEdit = () => {
-    router.push('/dashboard/ground-pricing');
+    router.push('/dashboard/settings');
   };
 
   const handleAddNew = () => {
-    router.push('/dashboard/ground-pricing');
+    router.push('/dashboard/settings');
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Title & Add New Ground CTA Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
             Manage Facilities
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 font-medium mt-0.5">
@@ -90,8 +112,8 @@ export const MyGroundsGrid: React.FC = () => {
         </Button>
       </div>
 
-      {/* 2x2 Ground Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* 3+ Cards per line Grid (Responsive: 1 -> 2 -> 3 -> 4) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
         {grounds.map((ground) => (
           <GroundCard
             key={ground.id}
@@ -106,8 +128,8 @@ export const MyGroundsGrid: React.FC = () => {
       <div className="pt-2 flex justify-center">
         <button
           type="button"
-          onClick={() => alert('Loading more facilities...')}
-          className="inline-flex items-center gap-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs"
+          onClick={() => alert('All facilities loaded.')}
+          className="inline-flex items-center gap-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 px-6 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs"
         >
           <ChevronDown className="w-4 h-4 text-gray-500" />
           <span>Load More Grounds</span>
