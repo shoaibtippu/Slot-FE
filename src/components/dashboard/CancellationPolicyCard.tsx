@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ShieldAlert } from 'lucide-react';
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const CancellationPolicyCard: React.FC = () => {
-  const [selectedPolicy, setSelectedPolicy] = useState<'no' | 'partial' | 'full'>('no');
+  const { data, updateStep2 } = useAddGround();
+  const selectedPolicy = data.step2.cancellationPolicy;
 
   const policies = [
     {
@@ -38,7 +40,9 @@ export const CancellationPolicyCard: React.FC = () => {
           return (
             <div
               key={policy.id}
-              onClick={() => setSelectedPolicy(policy.id as 'no' | 'partial' | 'full')}
+              onClick={() =>
+                updateStep2({ cancellationPolicy: policy.id as 'no' | 'partial' | 'full' })
+              }
               className={`
                 p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none flex items-start gap-3
                 ${isSelected

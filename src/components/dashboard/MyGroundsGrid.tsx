@@ -84,7 +84,7 @@ export const MyGroundsGrid: React.FC = () => {
   };
 
   const handleAddNew = () => {
-    router.push('/dashboard/settings');
+    router.push('/dashboard/grounds/add/step-1');
   };
 
   return (

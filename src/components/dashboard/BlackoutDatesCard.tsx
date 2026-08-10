@@ -2,51 +2,35 @@
 
 import React, { useState } from 'react';
 import { CalendarX, X, Plus } from 'lucide-react';
-
-interface BlackoutItem {
-  id: string;
-  name: string;
-  dateRange: string;
-  colorClass: string;
-}
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const BlackoutDatesCard: React.FC = () => {
-  const [blackouts, setBlackouts] = useState<BlackoutItem[]>([
-    {
-      id: '1',
-      name: 'Independence Day',
-      dateRange: 'Aug 15, 2024',
-      colorClass: 'bg-red-50/80 border-red-100 text-red-900',
-    },
-    {
-      id: '2',
-      name: 'Annual Maintenance',
-      dateRange: 'Oct 02 - Oct 05',
-      colorClass: 'bg-slate-100/80 border-slate-200 text-slate-900',
-    },
-  ]);
+  const { data, updateStep2 } = useAddGround();
+  const blackouts = data.step2.blackouts;
 
   const [showAddInput, setShowAddInput] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDates, setNewDates] = useState('');
 
   const handleRemove = (id: string) => {
-    setBlackouts((prev) => prev.filter((item) => item.id !== id));
+    updateStep2({ blackouts: blackouts.filter((item) => item.id !== id) });
   };
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName.trim() || !newDates.trim()) return;
 
-    setBlackouts((prev) => [
-      ...prev,
-      {
-        id: Math.random().toString(36).substring(2, 9),
-        name: newName.trim(),
-        dateRange: newDates.trim(),
-        colorClass: 'bg-emerald-50/80 border-emerald-100 text-emerald-900',
-      },
-    ]);
+    updateStep2({
+      blackouts: [
+        ...blackouts,
+        {
+          id: Math.random().toString(36).substring(2, 9),
+          name: newName.trim(),
+          dateRange: newDates.trim(),
+          colorClass: 'bg-emerald-50/80 border-emerald-100 text-emerald-900',
+        },
+      ],
+    });
 
     setNewName('');
     setNewDates('');

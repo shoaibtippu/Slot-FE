@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { TrendingUp, Clock } from 'lucide-react';
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const PeakHourPricingCard: React.FC = () => {
-  const [isEnabled, setIsEnabled] = useState(true);
-  const [startTime, setStartTime] = useState('05:00 pm');
-  const [endTime, setEndTime] = useState('10:00 pm');
-  const [peakPrice, setPeakPrice] = useState('65.00');
+  const { data, updateStep2 } = useAddGround();
+  const { peakEnabled: isEnabled, peakStart: startTime, peakEnd: endTime, peakPrice, currency } = data.step2;
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-xs border border-gray-200/80 space-y-5 h-full flex flex-col justify-between">
@@ -21,7 +20,7 @@ export const PeakHourPricingCard: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setIsEnabled(!isEnabled)}
+            onClick={() => updateStep2({ peakEnabled: !isEnabled })}
             className={`
               relative w-9 h-5 rounded-full transition-colors cursor-pointer focus:outline-none
               ${isEnabled ? 'bg-[#15803d]' : 'bg-gray-300'}
@@ -50,7 +49,7 @@ export const PeakHourPricingCard: React.FC = () => {
             <input
               type="text"
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={(e) => updateStep2({ peakStart: e.target.value })}
               className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 pl-9 text-xs font-semibold text-gray-800 focus:outline-none focus:bg-white focus:border-emerald-600"
             />
           </div>
@@ -66,7 +65,7 @@ export const PeakHourPricingCard: React.FC = () => {
             <input
               type="text"
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={(e) => updateStep2({ peakEnd: e.target.value })}
               className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 pl-9 text-xs font-semibold text-gray-800 focus:outline-none focus:bg-white focus:border-emerald-600"
             />
           </div>
@@ -78,12 +77,12 @@ export const PeakHourPricingCard: React.FC = () => {
             PEAK PRICE
           </label>
           <div className="relative flex items-center">
-            <span className="absolute left-3.5 font-bold text-gray-700 text-xs">$</span>
+            <span className="absolute left-3.5 font-bold text-gray-700 text-xs">{currency}</span>
             <input
               type="text"
               value={peakPrice}
-              onChange={(e) => setPeakPrice(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 pl-8 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-emerald-600"
+              onChange={(e) => updateStep2({ peakPrice: e.target.value })}
+              className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 pl-10 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-emerald-600"
             />
           </div>
         </div>

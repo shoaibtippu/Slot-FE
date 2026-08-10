@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { AddGroundProvider } from '@/context/AddGroundContext';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 
@@ -50,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Scrollable Main Workspace */}
         <main className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
-          {children}
+          <AddGroundProvider>{children}</AddGroundProvider>
         </main>
       </div>
     </div>

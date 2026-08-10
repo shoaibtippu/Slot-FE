@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { CreditCard, Info } from 'lucide-react';
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const AdvancePaymentCard: React.FC = () => {
-  const [percentage, setPercentage] = useState(50);
+  const { data, updateStep2 } = useAddGround();
+  const percentage = data.step2.advancePercent;
 
   const steps = [10, 25, 50, 75, 100];
 
@@ -34,7 +36,7 @@ export const AdvancePaymentCard: React.FC = () => {
           max="100"
           step="5"
           value={percentage}
-          onChange={(e) => setPercentage(Number(e.target.value))}
+          onChange={(e) => updateStep2({ advancePercent: Number(e.target.value) })}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#0b3327]"
         />
 
@@ -42,7 +44,7 @@ export const AdvancePaymentCard: React.FC = () => {
           {steps.map((step) => (
             <span
               key={step}
-              onClick={() => setPercentage(step)}
+              onClick={() => updateStep2({ advancePercent: step })}
               className={`cursor-pointer hover:text-gray-700 ${
                 percentage === step ? 'text-[#0b3327] font-bold' : ''
               }`}

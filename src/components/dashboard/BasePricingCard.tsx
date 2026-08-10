@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Banknote } from 'lucide-react';
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const BasePricingCard: React.FC = () => {
-  const [price, setPrice] = useState('45.00');
+  const { data, updateStep2 } = useAddGround();
+  const { basePrice, currency } = data.step2;
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-xs border border-gray-200/80 space-y-4 h-full flex flex-col justify-between">
@@ -19,12 +21,12 @@ export const BasePricingCard: React.FC = () => {
       </div>
 
       <div className="relative flex items-center pt-2">
-        <span className="absolute left-4 font-bold text-gray-700 text-sm">$</span>
+        <span className="absolute left-4 font-bold text-gray-700 text-xs">{currency}</span>
         <input
           type="text"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 pl-8 pr-24 text-sm font-bold text-gray-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all"
+          value={basePrice}
+          onChange={(e) => updateStep2({ basePrice: e.target.value })}
+          className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 pl-12 pr-24 text-sm font-bold text-gray-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all"
         />
         <span className="absolute right-3 bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
           PER HOUR

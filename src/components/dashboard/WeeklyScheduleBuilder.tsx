@@ -3,13 +3,7 @@
 import React, { useState } from 'react';
 import { Clock, Copy, Trash2, ChevronDown, Trophy } from 'lucide-react';
 import { Select } from '../ui/Select';
-
-interface DaySchedule {
-  day: string;
-  enabled: boolean;
-  openTime: string;
-  closeTime: string;
-}
+import { useAddGround } from '@/context/AddGroundContext';
 
 const TIME_OPTIONS = [
   '06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM',
@@ -18,40 +12,37 @@ const TIME_OPTIONS = [
 ];
 
 export const WeeklyScheduleBuilder: React.FC = () => {
-  const [schedules, setSchedules] = useState<DaySchedule[]>([
-    { day: 'Monday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-    { day: 'Tuesday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-    { day: 'Wednesday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-    { day: 'Thursday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-    { day: 'Friday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-    { day: 'Saturday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-    { day: 'Sunday', enabled: true, openTime: '08:00 AM', closeTime: '10:00 PM' },
-  ]);
+  const { data, updateStep2 } = useAddGround();
+  const schedules = data.step2.schedule;
 
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   const handleToggle = (index: number) => {
-    setSchedules((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, enabled: !item.enabled } : item))
-    );
+    updateStep2({
+      schedule: schedules.map((item, i) =>
+        i === index ? { ...item, enabled: !item.enabled } : item
+      ),
+    });
   };
 
   const handleTimeChange = (index: number, field: 'openTime' | 'closeTime', value: string) => {
-    setSchedules((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    updateStep2({
+      schedule: schedules.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    });
   };
 
   const handleCopyMondayToAll = () => {
     const monday = schedules[0];
-    setSchedules((prev) =>
-      prev.map((item) => ({
+    updateStep2({
+      schedule: schedules.map((item) => ({
         ...item,
         openTime: monday.openTime,
         closeTime: monday.closeTime,
         enabled: monday.enabled,
-      }))
-    );
+      })),
+    });
   };
 
   return (

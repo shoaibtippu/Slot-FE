@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+'use client';
+
+import React from 'react';
 import { Timer } from 'lucide-react';
 import { Select } from '../ui/Select';
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const BookingThresholdCard: React.FC = () => {
-  const [duration, setDuration] = useState('1 Hour');
+  const { data, updateStep2 } = useAddGround();
+  const duration = data.step2.minDuration;
 
   return (
     <div className="bg-[#0b3327] text-white rounded-2xl p-5 shadow-sm space-y-4 relative">
@@ -26,7 +30,7 @@ export const BookingThresholdCard: React.FC = () => {
           label="MINIMUM DURATION"
           variant="dark"
           value={duration}
-          onChange={(e) => setDuration(e.target.value)}
+          onChange={(e) => updateStep2({ minDuration: e.target.value })}
           options={[
             { value: '30 Mins', label: '30 Mins' },
             { value: '1 Hour', label: '1 Hour' },

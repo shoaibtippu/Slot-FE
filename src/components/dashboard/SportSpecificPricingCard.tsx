@@ -2,9 +2,16 @@
 
 import React, { useState } from 'react';
 import { Trophy, ChevronDown } from 'lucide-react';
+import { useAddGround } from '@/context/AddGroundContext';
 
 export const SportSpecificPricingCard: React.FC = () => {
+  const { data, updateStep2 } = useAddGround();
+  const { sportPrices, currency } = data.step2;
   const [isOpen, setIsOpen] = useState(false);
+
+  const setSportPrice = (sport: keyof typeof sportPrices, value: string) => {
+    updateStep2({ sportPrices: { ...sportPrices, [sport]: value } });
+  };
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-xs border border-gray-200/80">
@@ -37,27 +44,45 @@ export const SportSpecificPricingCard: React.FC = () => {
         <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div className="p-3 bg-gray-50 rounded-xl space-y-1">
             <span className="font-bold text-gray-800">Football Turf</span>
-            <input
-              type="text"
-              defaultValue="$ 45.00/hr"
-              className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs"
-            />
+            <div className="relative">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-bold text-gray-600 text-[10px]">
+                {currency}
+              </span>
+              <input
+                type="text"
+                value={sportPrices.football}
+                onChange={(e) => setSportPrice('football', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs pl-9"
+              />
+            </div>
           </div>
           <div className="p-3 bg-gray-50 rounded-xl space-y-1">
             <span className="font-bold text-gray-800">Padel Court</span>
-            <input
-              type="text"
-              defaultValue="$ 60.00/hr"
-              className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs"
-            />
+            <div className="relative">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-bold text-gray-600 text-[10px]">
+                {currency}
+              </span>
+              <input
+                type="text"
+                value={sportPrices.padel}
+                onChange={(e) => setSportPrice('padel', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs pl-9"
+              />
+            </div>
           </div>
           <div className="p-3 bg-gray-50 rounded-xl space-y-1">
             <span className="font-bold text-gray-800">Badminton Court</span>
-            <input
-              type="text"
-              defaultValue="$ 30.00/hr"
-              className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs"
-            />
+            <div className="relative">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 font-bold text-gray-600 text-[10px]">
+                {currency}
+              </span>
+              <input
+                type="text"
+                value={sportPrices.badminton}
+                onChange={(e) => setSportPrice('badminton', e.target.value)}
+                className="w-full rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs pl-9"
+              />
+            </div>
           </div>
         </div>
       )}
