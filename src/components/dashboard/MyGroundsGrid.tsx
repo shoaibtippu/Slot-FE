@@ -38,8 +38,12 @@ export const MyGroundsGrid: React.FC = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const handleEdit = () => {
-    router.push('/dashboard/settings');
+  const handleViewDetails = (id: string) => {
+    router.push(`/dashboard/grounds/${id}`);
+  };
+
+  const handleEdit = (id: string) => {
+    router.push(`/dashboard/grounds/${id}?edit=true`);
   };
 
   const handleAddNew = () => {
@@ -107,7 +111,7 @@ export const MyGroundsGrid: React.FC = () => {
             <GroundCard
               key={ground.id}
               ground={groundToCard(ground)}
-              onViewDetails={handleEdit}
+              onViewDetails={handleViewDetails}
               onEdit={handleEdit}
             />
           ))}

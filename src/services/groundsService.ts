@@ -61,6 +61,43 @@ export async function updateGroundSchedules(
   return data;
 }
 
+export async function getOwnerGroundById(id: string): Promise<GroundDetailResponse> {
+  const res = await fetch(`${BASE_URL}/api/grounds/${id}`, { headers: authHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  const raw = data.ground ?? data;
+  return {
+    ...raw,
+    schedules: raw.schedules ?? [],
+    images: raw.images ?? [],
+    sports: raw.sports ?? [],
+  };
+}
+
+export async function updateGround(
+  id: string,
+  payload: {
+    name: string | null;
+    description: string | null;
+    address: string | null;
+    latitude: number;
+    longitude: number;
+    phoneNumber: string;
+    alternatePhoneNumber: string | null;
+    hourlyRate: number;
+    advancePercentage: number;
+  },
+): Promise<GroundDetailResponse> {
+  const res = await fetch(`${BASE_URL}/api/grounds/${id}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data.ground ?? data;
+}
+
 export async function uploadGroundImages(
   groundId: string,
   files: File[],
