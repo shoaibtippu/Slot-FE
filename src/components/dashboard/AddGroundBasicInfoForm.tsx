@@ -5,6 +5,7 @@ import { MapPin, ImagePlus, X, Images } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { useAddGround } from '@/context/AddGroundContext';
+import { LocationMapPicker } from '@/components/dashboard/LocationMapPicker';
 
 const FACILITY_TYPES = [
   { value: 'Cricket Ground', label: 'Cricket Ground' },
@@ -123,51 +124,14 @@ export const AddGroundBasicInfoForm: React.FC = () => {
         </div>
       </section>
 
-      {/* Location */}
-      <section className="p-5 sm:p-6 space-y-5">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-emerald-100/80 text-emerald-900 flex items-center justify-center">
-            <MapPin className="w-4 h-4 text-[#0b3327]" />
-          </div>
-          <div>
-            <h3 className="text-sm font-extrabold text-gray-900">Location</h3>
-            <p className="text-[11px] text-gray-500">Where is your facility located?</p>
-          </div>
-        </div>
-
-        <Input
-          label="Street Address"
-          placeholder="e.g. Main Boulevard, Block C"
-          value={data.step1.address}
-          onChange={(e) => updateStep1({ address: e.target.value })}
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Select
-            label="Area / City"
-            value={data.step1.city}
-            onChange={(e) => updateStep1({ city: e.target.value })}
-            options={[
-              { value: 'Lahore', label: 'Lahore' },
-              { value: 'Karachi', label: 'Karachi' },
-              { value: 'Islamabad', label: 'Islamabad' },
-              { value: 'Rawalpindi', label: 'Rawalpindi' },
-              { value: 'Faisalabad', label: 'Faisalabad' },
-              { value: 'Multan', label: 'Multan' },
-            ]}
-          />
-        </div>
-      </section>
-
-      {/* Contact & Coordinates */}
+      {/* Contact */}
       <section className="p-5 sm:p-6 space-y-5">
         <div>
-          <h3 className="text-sm font-extrabold text-gray-900">Contact &amp; Coordinates</h3>
+          <h3 className="text-sm font-extrabold text-gray-900">Contact</h3>
           <p className="text-[11px] text-gray-500 mt-0.5">
-            Contact details and GPS coordinates for your facility.
+            Phone numbers customers can reach you on.
           </p>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Phone Number *"
@@ -181,21 +145,54 @@ export const AddGroundBasicInfoForm: React.FC = () => {
             value={data.step1.alternatePhoneNumber}
             onChange={(e) => updateStep1({ alternatePhoneNumber: e.target.value })}
           />
-          <Input
-            label="Latitude *"
-            type="number"
-            step="0.000001"
-            placeholder="e.g. 31.5204"
-            value={data.step1.latitude}
-            onChange={(e) => updateStep1({ latitude: e.target.value })}
-          />
-          <Input
-            label="Longitude *"
-            type="number"
-            step="0.000001"
-            placeholder="e.g. 74.3587"
-            value={data.step1.longitude}
-            onChange={(e) => updateStep1({ longitude: e.target.value })}
+        </div>
+      </section>
+
+      {/* Map Location */}
+      <section className="p-5 sm:p-6 space-y-5">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-emerald-100/80 flex items-center justify-center">
+            <MapPin className="w-4 h-4 text-[#0b3327]" />
+          </div>
+          <div>
+            <h3 className="text-sm font-extrabold text-gray-900">Pin Location on Map *</h3>
+            <p className="text-[11px] text-gray-500">Search or click the map to set your facility&apos;s exact location.</p>
+          </div>
+        </div>
+        <LocationMapPicker
+          latitude={data.step1.latitude ? parseFloat(data.step1.latitude) : null}
+          longitude={data.step1.longitude ? parseFloat(data.step1.longitude) : null}
+          onLocationChange={(lat, lng, address) => {
+            updateStep1({
+              latitude: lat.toString(),
+              longitude: lng.toString(),
+              ...(address ? { address } : {}),
+            });
+          }}
+        />
+
+        {/* Address details — auto-filled by map, but still editable */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
+            <Input
+              label="Street Address"
+              placeholder="Auto-filled when you pin a location above"
+              value={data.step1.address}
+              onChange={(e) => updateStep1({ address: e.target.value })}
+            />
+          </div>
+          <Select
+            label="City"
+            value={data.step1.city}
+            onChange={(e) => updateStep1({ city: e.target.value })}
+            options={[
+              { value: 'Lahore', label: 'Lahore' },
+              { value: 'Karachi', label: 'Karachi' },
+              { value: 'Islamabad', label: 'Islamabad' },
+              { value: 'Rawalpindi', label: 'Rawalpindi' },
+              { value: 'Faisalabad', label: 'Faisalabad' },
+              { value: 'Multan', label: 'Multan' },
+            ]}
           />
         </div>
       </section>

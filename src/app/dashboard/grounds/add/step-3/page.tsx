@@ -47,8 +47,8 @@ export default function AddGroundStep3Page() {
         address: data.step1.address
           ? `${data.step1.address}, ${data.step1.city}`
           : data.step1.city || null,
-        latitude: parseFloat(data.step1.latitude) || 0,
-        longitude: parseFloat(data.step1.longitude) || 0,
+        latitude: Math.round((parseFloat(data.step1.latitude) || 0) * 1e7) / 1e7,
+        longitude: Math.round((parseFloat(data.step1.longitude) || 0) * 1e7) / 1e7,
         phoneNumber: data.step1.phoneNumber,
         alternatePhoneNumber: data.step1.alternatePhoneNumber || null,
         hourlyRate: parseFloat(data.step2.basePrice) || 0,

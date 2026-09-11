@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setToken(null);
           setUser(null);
           setIsAuthenticated(false);
-          if (pathname.startsWith('/dashboard')) {
+          if (pathname.startsWith('/dashboard') || pathname.startsWith('/user')) {
             router.replace('/login');
           }
         }

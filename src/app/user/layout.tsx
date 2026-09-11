@@ -3,11 +3,10 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { AddGroundProvider } from '@/context/AddGroundContext';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { UserSidebar } from '@/components/user/UserSidebar';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function UserLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
@@ -17,8 +16,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.replace('/login');
       return;
     }
-    if (user?.role === 'User') {
-      router.replace('/user/home');
+    if (user?.role && user.role !== 'User') {
+      router.replace('/dashboard/stats');
     }
   }, [isLoading, isAuthenticated, user, router]);
 
@@ -46,18 +45,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="h-screen w-screen max-h-screen max-w-vw flex flex-row bg-[#f8fafc] overflow-hidden font-sans">
-      {/* 1. Generic Left Sidebar */}
-      <DashboardSidebar />
-
-      {/* 2. Generic Right Workspace Area */}
+      <UserSidebar />
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Top Header */}
         <DashboardHeader />
-
-        {/* Scrollable Main Workspace */}
-        <main className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
-          <AddGroundProvider>{children}</AddGroundProvider>
-        </main>
+        <main className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">{children}</main>
       </div>
     </div>
   );

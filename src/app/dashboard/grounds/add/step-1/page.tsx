@@ -21,8 +21,10 @@ export default function AddGroundStep1Page() {
       setError('Please enter a phone number for your ground.');
       return;
     }
-    if (!data.step1.latitude.trim() || !data.step1.longitude.trim()) {
-      setError('Please enter the latitude and longitude of your ground.');
+    const lat = parseFloat(data.step1.latitude);
+    const lng = parseFloat(data.step1.longitude);
+    if (!data.step1.latitude || !data.step1.longitude || isNaN(lat) || isNaN(lng)) {
+      setError('Please pin your facility location on the map before continuing.');
       return;
     }
     if (data.step1.photos.length === 0) {

@@ -94,6 +94,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       const role = token ? getUserRoleFromToken(token) : null;
       if (onLoginSuccess) {
         onLoginSuccess(role);
+      } else if (role === 'User') {
+        router.replace('/user/home');
       } else {
         router.replace('/dashboard/stats');
       }
@@ -136,12 +138,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         <div className="w-full pt-2 flex flex-col gap-2">
           <Button
-            onClick={() => router.push('/dashboard/stats')}
+            onClick={() => {
+              const tok = loginResponse?.accessToken ?? (typeof window !== 'undefined' ? localStorage.getItem('slot_auth_token') : null);
+              const r = tok ? getUserRoleFromToken(tok) : null;
+              router.push(r === 'User' ? '/user/home' : '/dashboard/stats');
+            }}
             variant="primary"
             fullWidth
             size="md"
           >
-            View Ground Owner Dashboard
+            Go to Dashboard
           </Button>
 
           <Button
