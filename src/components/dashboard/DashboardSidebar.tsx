@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, MapPin, Calendar, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, MapPin, Calendar, Star, Settings, LogOut } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { useAuth } from '@/context/AuthContext';
 
@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/stats' },
   { label: 'My Grounds', icon: MapPin, href: '/dashboard/grounds' },
   { label: 'Bookings', icon: Calendar, href: '/dashboard/bookings' },
+  { label: 'Reviews', icon: Star, href: '/dashboard/reviews' },
   { label: 'Settings', icon: Settings, href: '/dashboard/settings' },
 ];
 

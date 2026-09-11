@@ -159,6 +159,47 @@ export const AddGroundBasicInfoForm: React.FC = () => {
         </div>
       </section>
 
+      {/* Contact & Coordinates */}
+      <section className="p-5 sm:p-6 space-y-5">
+        <div>
+          <h3 className="text-sm font-extrabold text-gray-900">Contact &amp; Coordinates</h3>
+          <p className="text-[11px] text-gray-500 mt-0.5">
+            Contact details and GPS coordinates for your facility.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Phone Number *"
+            placeholder="e.g. +92 300 1234567"
+            value={data.step1.phoneNumber}
+            onChange={(e) => updateStep1({ phoneNumber: e.target.value })}
+          />
+          <Input
+            label="Alternate Phone (optional)"
+            placeholder="e.g. +92 321 7654321"
+            value={data.step1.alternatePhoneNumber}
+            onChange={(e) => updateStep1({ alternatePhoneNumber: e.target.value })}
+          />
+          <Input
+            label="Latitude *"
+            type="number"
+            step="0.000001"
+            placeholder="e.g. 31.5204"
+            value={data.step1.latitude}
+            onChange={(e) => updateStep1({ latitude: e.target.value })}
+          />
+          <Input
+            label="Longitude *"
+            type="number"
+            step="0.000001"
+            placeholder="e.g. 74.3587"
+            value={data.step1.longitude}
+            onChange={(e) => updateStep1({ longitude: e.target.value })}
+          />
+        </div>
+      </section>
+
       {/* Amenities */}
       <section className="p-5 sm:p-6 space-y-4">
         <div>

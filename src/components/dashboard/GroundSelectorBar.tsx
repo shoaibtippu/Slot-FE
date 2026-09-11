@@ -1,23 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
+import Link from 'next/link';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
+import { getMyGrounds } from '@/services/groundsService';
 
 interface GroundOption {
   id: string;
   name: string;
 }
 
-const GROUNDS: GroundOption[] = [
-  { id: '1', name: 'Green Valley Cricket Ground' },
-  { id: '2', name: 'Downtown Football Turf' },
-  { id: '3', name: 'Apex Padel Arena' },
-];
-
 export const GroundSelectorBar: React.FC = () => {
-  const [selectedGround, setSelectedGround] = useState<string>('1');
+  const [grounds, setGrounds] = useState<GroundOption[]>([]);
+  const [selectedGround, setSelectedGround] = useState<string>('');
+
+  useEffect(() => {
+    getMyGrounds()
+      .then((res) => {
+        const options = res.grounds.map((g) => ({ id: g.id, name: g.name ?? 'Unnamed Ground' }));
+        setGrounds(options);
+        if (options.length > 0) setSelectedGround(options[0].id);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
@@ -26,28 +33,30 @@ export const GroundSelectorBar: React.FC = () => {
         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">
           CURRENT GROUND
         </label>
-        <Select
-          variant="ghost"
-          value={selectedGround}
-          onChange={(e) => setSelectedGround(e.target.value)}
-          options={GROUNDS.map((ground) => ({
-            value: ground.id,
-            label: ground.name,
-          }))}
-        />
+        {grounds.length === 0 ? (
+          <p className="text-xs text-gray-400 py-1">No grounds yet</p>
+        ) : (
+          <Select
+            variant="ghost"
+            value={selectedGround}
+            onChange={(e) => setSelectedGround(e.target.value)}
+            options={grounds.map((g) => ({ value: g.id, label: g.name }))}
+          />
+        )}
       </div>
 
-      {/* + New Booking Button */}
-      <Button
-        type="button"
-        variant="primary"
-        size="md"
-        onClick={() => alert('New Booking modal opened!')}
-        icon={<Plus className="w-4 h-4" />}
-        className="font-bold shrink-0 self-end sm:self-auto py-3 px-5"
-      >
-        New Booking
-      </Button>
+      {/* + New Ground Button */}
+      <Link href="/dashboard/grounds/add/step-1">
+        <Button
+          type="button"
+          variant="primary"
+          size="md"
+          icon={<Plus className="w-4 h-4" />}
+          className="font-bold shrink-0 self-end sm:self-auto py-3 px-5"
+        >
+          New Ground
+        </Button>
+      </Link>
     </div>
   );
 };

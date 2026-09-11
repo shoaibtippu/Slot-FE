@@ -79,7 +79,6 @@ export async function loginUser(payload: ApiLoginPayload): Promise<ApiLoginRespo
       }
     }
 
-    // Check backend error field or HTTP status error
     if (data.error) {
       throw new Error(data.error);
     }
@@ -88,7 +87,6 @@ export async function loginUser(payload: ApiLoginPayload): Promise<ApiLoginRespo
       throw new Error(`Login failed with status code ${response.status}`);
     }
 
-    // Store auth token and user id in localStorage and cookie upon success
     if (data.accessToken) {
       setAuthToken(data.accessToken, data.userId || undefined, data.email || undefined);
     }
@@ -104,5 +102,22 @@ export async function loginUser(payload: ApiLoginPayload): Promise<ApiLoginRespo
       throw error;
     }
     throw new Error('An unexpected error occurred during login.');
+  }
+}
+
+export async function forgotPassword(email: string): Promise<{ success: boolean; message: string | null }> {
+  const url = `${BASE_URL}/api/account/forgot-password`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || data.error || `HTTP ${response.status}`);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof Error) throw error;
+    throw new Error('Failed to send reset link.');
   }
 }

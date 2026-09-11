@@ -1,12 +1,32 @@
 import React from 'react';
 import { Banknote, Calendar, Bell, Star } from 'lucide-react';
 
-export const StatsCardsGrid: React.FC = () => {
+interface StatsCardsGridProps {
+  totalRevenue?: number;
+  totalBookings?: number;
+  pendingBookings?: number;
+  averageRating?: number;
+  isLoading?: boolean;
+}
+
+export const StatsCardsGrid: React.FC<StatsCardsGridProps> = ({
+  totalRevenue,
+  totalBookings,
+  pendingBookings,
+  averageRating,
+  isLoading = false,
+}) => {
+  const dash = '—';
+
   const stats = [
     {
       title: 'Total Earnings This Month',
-      value: 'PKR 145,000',
-      badge: '+12%',
+      value: isLoading
+        ? dash
+        : totalRevenue !== undefined
+          ? `PKR ${totalRevenue.toLocaleString()}`
+          : 'PKR 0',
+      badge: undefined as string | undefined,
       badgeColor: 'bg-[#a7f3d0]/80 text-[#0b3327]',
       icon: Banknote,
       iconBg: 'bg-emerald-50 text-[#0b3327]',
@@ -14,21 +34,31 @@ export const StatsCardsGrid: React.FC = () => {
     },
     {
       title: 'Total Bookings This Month',
-      value: '84',
+      value: isLoading ? dash : totalBookings !== undefined ? String(totalBookings) : '0',
+      badge: undefined as string | undefined,
+      badgeColor: '',
       icon: Calendar,
       iconBg: 'bg-gray-100 text-gray-700',
       valueColor: 'text-gray-900',
     },
     {
       title: 'Pending Confirmations',
-      value: '7',
+      value: isLoading ? dash : pendingBookings !== undefined ? String(pendingBookings) : '0',
+      badge: undefined as string | undefined,
+      badgeColor: '',
       icon: Bell,
       iconBg: 'bg-red-50 text-red-500',
-      valueColor: 'text-red-600',
+      valueColor: pendingBookings && pendingBookings > 0 ? 'text-red-600' : 'text-gray-900',
     },
     {
       title: 'Average Rating',
-      value: '4.8/5',
+      value: isLoading
+        ? dash
+        : averageRating !== undefined
+          ? `${averageRating.toFixed(1)}/5`
+          : '—',
+      badge: undefined as string | undefined,
+      badgeColor: '',
       icon: Star,
       iconBg: 'bg-amber-50 text-amber-500',
       valueColor: 'text-gray-900',
@@ -39,7 +69,6 @@ export const StatsCardsGrid: React.FC = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat, idx) => {
         const Icon = stat.icon;
-
         return (
           <div
             key={idx}
@@ -50,15 +79,18 @@ export const StatsCardsGrid: React.FC = () => {
                 <Icon className="w-5 h-5" />
               </div>
               {stat.badge && (
-                <span className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${stat.badgeColor}`}>
+                <span
+                  className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${stat.badgeColor}`}
+                >
                   {stat.badge}
                 </span>
               )}
             </div>
-
             <div>
               <p className="text-xs text-gray-500 font-semibold">{stat.title}</p>
-              <h3 className={`text-xl sm:text-2xl font-black tracking-tight mt-1 ${stat.valueColor}`}>
+              <h3
+                className={`text-xl sm:text-2xl font-black tracking-tight mt-1 ${stat.valueColor}`}
+              >
                 {stat.value}
               </h3>
             </div>

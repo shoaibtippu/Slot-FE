@@ -1,27 +1,56 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { GroundSelectorBar } from '@/components/dashboard/GroundSelectorBar';
 import { StatsCardsGrid } from '@/components/dashboard/StatsCardsGrid';
 import { AnalyticsChartsSection } from '@/components/dashboard/AnalyticsChartsSection';
 import { ReviewsSection } from '@/components/dashboard/ReviewsSection';
+import { getOwnerStats } from '@/services/groundsService';
+import { OwnerStatsResponse } from '@/types/grounds';
 
 export default function GroundOwnerDashboardStatsPage() {
+  const [stats, setStats] = useState<OwnerStatsResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getOwnerStats()
+      .then((res) => setStats(res.stats))
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const latestReviews = stats?.latestReviews.map((r) => ({
+    name: r.reviewerEmail?.split('@')[0] ?? 'Anonymous',
+    timeAgo: r.createdAt
+      ? new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : '',
+    rating: r.rating,
+    comment: r.comment ? `"${r.comment}"` : '',
+  }));
+
   return (
     <>
-      {/* Ground Selector & CTA Bar */}
       <GroundSelectorBar />
 
-      {/* 4 Metric Stats Cards */}
-      <StatsCardsGrid />
+      <StatsCardsGrid
+        totalRevenue={stats?.totalRevenue}
+        totalBookings={stats?.totalBookings}
+        pendingBookings={stats?.pendingBookings}
+        averageRating={stats?.averageRating}
+        isLoading={isLoading}
+      />
 
-      {/* 2 Analytics Charts Section (Weekly Bookings & Most Booked Sports) */}
-      <AnalyticsChartsSection />
+      <AnalyticsChartsSection
+        weeklyBookings={stats?.weeklyBookings}
+        pendingBookings={stats?.pendingBookings}
+        confirmedBookings={stats?.confirmedBookings}
+        completedBookings={stats?.completedBookings}
+        cancelledBookings={stats?.cancelledBookings}
+        isLoading={isLoading}
+      />
 
-      {/* Latest Ground Reviews Section */}
-      <ReviewsSection />
+      <ReviewsSection reviews={latestReviews} isLoading={isLoading} />
 
-      {/* Dashboard Footer Note */}
       <footer className="pt-6 pb-2 text-center border-t border-gray-200/60">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
           POWERED BY SLOT MANAGEMENT SUITE © 2024

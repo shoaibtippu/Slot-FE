@@ -6,6 +6,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { ArrowLeft, Mail, KeyRound, Send, CheckCircle2 } from 'lucide-react';
 import { StadiumCard } from '../common/StadiumCard';
+import { forgotPassword } from '@/services/authService';
 
 interface ForgotPasswordFormProps {
   onLoginClick?: () => void;
@@ -17,7 +18,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onLoginC
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -32,11 +33,14 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onLoginC
     }
 
     setIsSubmitting(true);
-    // Simulate sending password reset link
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await forgotPassword(email.trim());
       setIsSubmitted(true);
-    }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send reset link. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

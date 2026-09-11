@@ -25,6 +25,10 @@ export interface AddGroundStep1 {
   city: string;
   amenities: string[];
   photos: string[];
+  latitude: string;
+  longitude: string;
+  phoneNumber: string;
+  alternatePhoneNumber: string;
 }
 
 export interface AddGroundStep2 {
@@ -67,6 +71,10 @@ export const DEFAULT_ADD_GROUND_DATA: AddGroundData = {
     city: 'Lahore',
     amenities: [],
     photos: [],
+    latitude: '',
+    longitude: '',
+    phoneNumber: '',
+    alternatePhoneNumber: '',
   },
   step2: {
     basePrice: '45.00',
